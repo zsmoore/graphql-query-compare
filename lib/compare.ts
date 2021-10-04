@@ -318,6 +318,13 @@ function compare(): void {
   const root1: SelectionSetNode = reWriteASTToSelectionSets(queryNode2, query2);
   const root2: SelectionSetNode = reWriteASTToSelectionSets(queryNode, query1);
 
+  process.stdout.write('SelectionSet 1\n');
+  printFullSelectionSet(root1);
+  process.stdout.write('\n\n');
+  process.stdout.write('SelectionSet 2\n');
+  printFullSelectionSet(root2);
+  process.stdout.write('\n\n');
+  process.stdout.write('Are queries structurally equivalent?\n');
   process.stdout.write(String(areSelectionsStructurallyEqual(root1, root2)));
 }
 
