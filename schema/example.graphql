@@ -1,0 +1,17 @@
+query example($id: ID!) {
+    Tweet(id: $id) {
+        id
+        body
+        date
+        Author {
+            first_name
+            last_name
+            full_name
+        }
+        Stats {
+            views
+            likes
+            retweets
+        }
+    }
+}

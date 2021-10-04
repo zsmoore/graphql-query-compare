@@ -1,0 +1,37 @@
+{
+  "name": "graphql-query-compare",
+  "version": "0.0.1",
+  "description": "Compare GraphQL Queries for Equality",
+  "main": "dist/index.js",
+  "scripts": {
+    "run": "tsc && node dist/index.js",
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "lint": "npx eslint ./lib/**",
+    "fix-lint": "npx eslint ./lib/** --fix"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/zsmoore/graphql-query-compare.git"
+  },
+  "keywords": [
+    "graphql"
+  ],
+  "author": "Zachary Moore",
+  "license": "Apache-2.0",
+  "bugs": {
+    "url": "https://github.com/zsmoore/graphql-query-compare/issues"
+  },
+  "homepage": "https://github.com/zsmoore/graphql-query-compare#readme",
+  "devDependencies": {
+    "@types/node": "^16.10.2",
+    "@typescript-eslint/eslint-plugin": "^4.32.0",
+    "@typescript-eslint/parser": "^4.32.0",
+    "eslint": "^7.32.0",
+    "eslint-config-airbnb-base": "^14.2.1",
+    "eslint-plugin-import": "^2.24.2"
+  },
+  "dependencies": {
+    "graphql": "^15.6.0",
+    "graphql-tag": "^2.12.5"
+  }
+}
