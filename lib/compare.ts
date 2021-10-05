@@ -4,64 +4,11 @@ import {
   FieldNode,
   FragmentDefinitionNode,
   OperationDefinitionNode,
+  parse,
   SelectionNode,
   SelectionSetNode,
   visit,
 } from 'graphql';
-
-import { gql } from 'graphql-tag';
-
-const query1 = gql`
-    query example($id: ID!) {
-        Tweet(id: $id) {
-            id
-            body
-            Author {
-                first_name
-                last_name
-                full_name
-            }
-            Stats {
-                views
-                likes
-                retweets
-            }
-            date
-        }
-    }
-`;
-
-const query2 = gql`
-    query example2($id: ID!) {
-        Tweet(id: $id) {
-            ...tweet
-        }
-    }
-
-    fragment author on User {
-        first_name
-        last_name
-        full_name
-    }
-
-    fragment stats on Stat {
-        views
-        likes
-        retweets
-    }
-
-    fragment tweet on Tweet {
-        id
-        body
-        date
-        Author {
-            ...author
-        }
-        Stats {
-            ...stats
-        }
-    }
-`;
 
 function filterToOperations(arr: readonly DefinitionNode[]): OperationDefinitionNode[] {
   return arr.filter((el) => el.kind === 'OperationDefinition') as OperationDefinitionNode[];
@@ -288,10 +235,18 @@ function areSelectionsStructurallyEqual(
        FieldNode[] = mapToSortedFieldsByName(currentNode2);
 
     if (!areFieldNameArraysEqual(currentNodeFieldSelection, currentNode2FieldSelection)) {
+      process.stdout.write('Field name mismatch\n');
       return false;
     }
 
     for (let i = 0; i < currentNodeFieldSelection.length; i += 1) {
+      process.stdout.write(`pushing field ${currentNodeFieldSelection[i].name.value}\n`);
+      if (currentNodeFieldSelection[i].selectionSet) {
+        console.log(currentNodeFieldSelection[i].selectionSet);
+      }
+      if (currentNode2FieldSelection[i].selectionSet) {
+        console.log(currentNode2FieldSelection[i].selectionSet);
+      }
       let currentFieldHasSelectionSet = false;
       if (currentNodeFieldSelection[i].selectionSet) {
         queue1.push(currentNodeFieldSelection[i].selectionSet!!);
@@ -301,6 +256,7 @@ function areSelectionsStructurallyEqual(
       if (currentNode2FieldSelection[i].selectionSet) {
         queue2.push(currentNode2FieldSelection[i].selectionSet!!);
       } else if (currentFieldHasSelectionSet) {
+        process.stdout.write('No selection mismatch\n');
         return false;
       }
     }
@@ -308,24 +264,26 @@ function areSelectionsStructurallyEqual(
   return true;
 }
 
-function compare(): void {
-  const queryNode: OperationDefinitionNode | undefined = getQuery(query1);
-  const queryNode2: OperationDefinitionNode | undefined = getQuery(query2);
+function compare(document: string, document2: string): void {
+  const documentNode: DocumentNode = parse(document);
+  const documentNode2: DocumentNode = parse(document2);
+  const queryNode: OperationDefinitionNode | undefined = getQuery(documentNode);
+  const queryNode2: OperationDefinitionNode | undefined = getQuery(documentNode2);
   if (queryNode === undefined || queryNode2 === undefined) {
     return;
   }
 
-  const root1: SelectionSetNode = reWriteASTToSelectionSets(queryNode2, query2);
-  const root2: SelectionSetNode = reWriteASTToSelectionSets(queryNode, query1);
+  const root1: SelectionSetNode = reWriteASTToSelectionSets(queryNode, documentNode);
+  const root2: SelectionSetNode = reWriteASTToSelectionSets(queryNode2, documentNode2);
 
   process.stdout.write('SelectionSet 1\n');
   printFullSelectionSet(root1);
   process.stdout.write('\n\n');
   process.stdout.write('SelectionSet 2\n');
   printFullSelectionSet(root2);
+  const equivalent: boolean = areSelectionsStructurallyEqual(root1, root2);
   process.stdout.write('\n\n');
-  process.stdout.write('Are queries structurally equivalent?\n');
-  process.stdout.write(String(areSelectionsStructurallyEqual(root1, root2)));
+  process.stdout.write(`Are queries structurally equivalent?\n${equivalent}`);
 }
 
 export default compare;
