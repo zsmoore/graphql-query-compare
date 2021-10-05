@@ -4,7 +4,7 @@
   "description": "Compare GraphQL Queries for Equality",
   "main": "dist/index.js",
   "scripts": {
-    "run": "tsc && node dist/index.js",
+    "run": "tsc && node dist/index.js schema/example.graphql schema/example2.graphql",
     "test": "echo \"Error: no test specified\" && exit 1",
     "lint": "npx eslint ./lib/**",
     "fix-lint": "npx eslint ./lib/** --fix"
